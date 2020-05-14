@@ -1,3 +1,4 @@
+from __future__ import division
 import colorsys
 import xml.etree.cElementTree as ET
 import plistlib
@@ -11,23 +12,21 @@ all_colors = {}
 IGNORE_COLOR = (None, None, None)
 IGNORE_COLOR_VALUE = "#IGNORE_COLOR"
 
-
 # http://effbot.org/zone/element-lib.htm#prettyprint
 def indent(elem, level=0):
-    i = "\n" + level * "  "
+    i = "\n" + level*"  "
     if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = i + "  "
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:
-            indent(elem, level + 1)
+            indent(elem, level+1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
-
 
 def capitalize_colors(elem):
     if len(elem):
@@ -36,29 +35,24 @@ def capitalize_colors(elem):
                 elem.set("value", elem.get("value").upper())
             capitalize_colors(elem)
 
-
 def hex_to_rgb(color):
     l = len(color)
-    r = int(color[l - 6:l - 4], 16) / 256 if l >= 6 else 0
-    g = int(color[l - 4:l - 2], 16) / 256 if l >= 4 else 0
-    b = int(color[l - 2:l], 16) / 256
+    r = int(color[l-6:l-4], 16) / 256 if l >= 6 else 0
+    g = int(color[l-4:l-2], 16) / 256 if l >= 4 else 0
+    b = int(color[l-2:l], 16) / 256
     return r, g, b
-
 
 def hex_to_yiq(color):
     return colorsys.rgb_to_yiq(*hex_to_rgb(color))
 
-
 def rgb256_to_hex(r, g, b):
     return "{0:02x}{1:02x}{2:02x}".format(r, g, b)
-
 
 def rgb_to_hex(r, g, b):
     r = min(int(r * 256), 255)
     g = min(int(g * 256), 255)
     b = min(int(b * 256), 255)
     return rgb256_to_hex(r, g, b)
-
 
 class AttributeValue:
     def __init__(self, foreground=None, background=None, foreground_rgb=None, background_rgb=None,
@@ -76,7 +70,6 @@ class AttributeValue:
         self.effect_color = None
         self.effect_type = effect_type
         self.inherited = False
-
 
 class DerivedAttributeValue:
     def __init__(self, parent=None, default_fore=None, default_back=None, default_font=0, error_stripe=None):
@@ -146,13 +139,12 @@ class DerivedAttributeValue:
             return self.parent.value.effect_color
         return None
 
-
 class Attribute:
     def __init__(self, id, parent, scope=None, foreground=None, background=None, font_style=0, effect_type=None):
         self.id = id
         self.parent = parent
         self.scope = scope
-        if id in default_attributes:
+        if default_attributes.has_key(id):
             self.value = default_attributes[id]
             if background == IGNORE_COLOR:
                 self.value.default_back = IGNORE_COLOR_VALUE
@@ -162,20 +154,16 @@ class Attribute:
         else:
             self.value = DerivedAttributeValue(parent=parent)
             if foreground:
-                self.value.default_fore = rgb256_to_hex(
-                    *foreground) if foreground != IGNORE_COLOR else IGNORE_COLOR_VALUE
+                self.value.default_fore = rgb256_to_hex(*foreground) if foreground != IGNORE_COLOR else IGNORE_COLOR_VALUE
             if background:
-                self.value.default_back = rgb256_to_hex(
-                    *background) if background != IGNORE_COLOR else IGNORE_COLOR_VALUE
+                self.value.default_back = rgb256_to_hex(*background) if background != IGNORE_COLOR else IGNORE_COLOR_VALUE
             if font_style:
                 self.value.default_font = font_style
             if effect_type:
                 self.value.effect_type = effect_type
         all_attributes.append(self)
 
-
 text = Attribute("TEXT", None)
-
 
 def load_default_attributes(scheme_path):
     scheme = ET.ElementTree(file=scheme_path)
@@ -196,43 +184,42 @@ def load_default_attributes(scheme_path):
             if option_name == 'EFFECT_COLOR': attr_value.default_effect_color = option_value
         default_attributes[name] = attr_value
 
-
 load_default_attributes('DefaultColorSchemesManager.xml')
 
 for id in [
-    "SEARCH_RESULT_ATTRIBUTES",  # EditorColors
-    "WRITE_SEARCH_RESULT_ATTRIBUTES",
-    "IDENTIFIER_UNDER_CARET_ATTRIBUTES",
-    "WRITE_IDENTIFIER_UNDER_CARET_ATTRIBUTES",
-    "TEXT_SEARCH_RESULT_ATTRIBUTES",
-    "INJECTED_LANGUAGE_FRAGMENT",
-    "ERRORS_ATTRIBUTES",  # CodeInsightColors
-    "WARNING_ATTRIBUTES",
-    "GENERIC_SERVER_ERROR_OR_WARNING",
-    "DUPLICATE_FROM_SERVER",
-    "INFO_ATTRIBUTES",
-    "NOT_USED_ELEMENT_ATTRIBUTES",
-    "DEPRECATED_ATTRIBUTES",
-    "HYPERLINK_ATTRIBUTES",
-    "FOLLOWED_HYPERLINK_ATTRIBUTES",
-    "TODO_DEFAULT_ATTRIBUTES",
-    "CONSOLE_NORMAL_OUTPUT",  # ConsoleViewContentType
-    "CONSOLE_ERROR_OUTPUT",
-    "CONSOLE_USER_INPUT",
-    "CONSOLE_RED_OUTPUT",
-    "CONSOLE_GREEN_OUTPUT",
-    "CONSOLE_YELLOW_OUTPUT",
-    "CONSOLE_BLUE_OUTPUT",
-    "CONSOLE_MAGENTA_OUTPUT",
-    "CONSOLE_CYAN_OUTPUT",
-    "CONSOLE_GRAY_OUTPUT",
-    "CONSOLE_SYSTEM_OUTPUT",
-    "CUSTOM_KEYWORD1_ATTRIBUTES",  # CustomHighlighterColors
-    "CUSTOM_KEYWORD2_ATTRIBUTES",
-    "CUSTOM_KEYWORD3_ATTRIBUTES",
-    "CUSTOM_KEYWORD4_ATTRIBUTES",
-    "BREAKPOINT_ATTRIBUTES"  # DebuggerColors
-]:
+           "SEARCH_RESULT_ATTRIBUTES",                # EditorColors
+           "WRITE_SEARCH_RESULT_ATTRIBUTES",
+           "IDENTIFIER_UNDER_CARET_ATTRIBUTES",
+           "WRITE_IDENTIFIER_UNDER_CARET_ATTRIBUTES",
+           "TEXT_SEARCH_RESULT_ATTRIBUTES",
+           "INJECTED_LANGUAGE_FRAGMENT",
+           "ERRORS_ATTRIBUTES",                       # CodeInsightColors
+           "WARNING_ATTRIBUTES",
+           "GENERIC_SERVER_ERROR_OR_WARNING",
+           "DUPLICATE_FROM_SERVER",
+           "INFO_ATTRIBUTES",
+           "NOT_USED_ELEMENT_ATTRIBUTES",
+           "DEPRECATED_ATTRIBUTES",
+           "HYPERLINK_ATTRIBUTES",
+           "FOLLOWED_HYPERLINK_ATTRIBUTES",
+           "TODO_DEFAULT_ATTRIBUTES",
+           "CONSOLE_NORMAL_OUTPUT",                   # ConsoleViewContentType
+           "CONSOLE_ERROR_OUTPUT",
+           "CONSOLE_USER_INPUT",
+           "CONSOLE_RED_OUTPUT",
+           "CONSOLE_GREEN_OUTPUT",
+           "CONSOLE_YELLOW_OUTPUT",
+           "CONSOLE_BLUE_OUTPUT",
+           "CONSOLE_MAGENTA_OUTPUT",
+           "CONSOLE_CYAN_OUTPUT",
+           "CONSOLE_GRAY_OUTPUT",
+           "CONSOLE_SYSTEM_OUTPUT",
+           "CUSTOM_KEYWORD1_ATTRIBUTES",              # CustomHighlighterColors
+           "CUSTOM_KEYWORD2_ATTRIBUTES",
+           "CUSTOM_KEYWORD3_ATTRIBUTES",
+           "CUSTOM_KEYWORD4_ATTRIBUTES",
+           "BREAKPOINT_ATTRIBUTES"                   # DebuggerColors
+          ]:
     Attribute(id, text)
 
 # HighlighterColors
@@ -241,44 +228,43 @@ matched_brace = Attribute("MATCHED_BRACE_ATTRIBUTES", text, background=(153, 204
 unmatched_brace = Attribute("UNMATCHED_BRACE_ATTRIBUTES", text, background=(255, 220, 220))
 
 # DefaultLanguageHighlighterColors (MUST HAVE!)
-default_identifier = Attribute("DEFAULT_IDENTIFIER", text, scope='entity')
-default_number = Attribute("DEFAULT_NUMBER", text, scope='constant.numeric')
-default_keyword = Attribute("DEFAULT_KEYWORD", text, scope='keyword')
-default_string = Attribute("DEFAULT_STRING", text, scope='string')
-default_block_comment = Attribute("DEFAULT_BLOCK_COMMENT", text, scope='comment.block')
-default_line_comment = Attribute("DEFAULT_LINE_COMMENT", text, scope='comment.line')
-default_doc_comment = Attribute("DEFAULT_DOC_COMMENT", text, scope='comment.documentation')
-default_operation_sign = Attribute("DEFAULT_OPERATION_SIGN", text, scope='keyword.operator')
-default_braces = Attribute("DEFAULT_BRACES", text, scope='punctuation')
-default_dot = Attribute("DEFAULT_DOT", text, scope='punctuation')
-default_semicolon = Attribute("DEFAULT_SEMICOLON", text, scope='punctuation')
-default_comma = Attribute("DEFAULT_COMMA", text, scope='punctuation')
-default_parentheses = Attribute("DEFAULT_PARENTHS", text, scope='punctuation')
-default_brackets = Attribute("DEFAULT_BRACKETS", text, scope='punctuation')
-default_label = Attribute("DEFAULT_LABEL", default_identifier)
-default_constant = Attribute("DEFAULT_CONSTANT", default_identifier, scope='constant')
-default_local_variable = Attribute("DEFAULT_LOCAL_VARIABLE", default_identifier, scope='variable')
-default_global_variable = Attribute("DEFAULT_GLOBAL_VARIABLE", default_local_variable, font_style=2)
-default_function_declaration = Attribute("DEFAULT_FUNCTION_DECLARATION", default_identifier,
-                                         scope='entity.name.function')
-default_function_call = Attribute("DEFAULT_FUNCTION_CALL", default_identifier, scope='support.function')
-default_parameter = Attribute("DEFAULT_PARAMETER", default_identifier, scope='variable.parameter')
-default_class_name = Attribute("DEFAULT_CLASS_NAME", default_identifier, scope='entity.name')
-default_interface_name = Attribute("DEFAULT_INTERFACE_NAME", default_class_name)
-default_instance_method = Attribute("DEFAULT_INSTANCE_METHOD", default_function_declaration)
-default_instance_field = Attribute("DEFAULT_INSTANCE_FIELD", default_local_variable)
-default_static_method = Attribute("DEFAULT_STATIC_METHOD", default_function_declaration)
-default_static_field = Attribute("DEFAULT_STATIC_FIELD", default_global_variable)
-default_doc_comment_markup = Attribute("DEFAULT_DOC_MARKUP", default_doc_comment)
-default_doc_comment_tag = Attribute("DEFAULT_DOC_COMMENT_TAG", default_doc_comment)
-default_valid_string_escape = Attribute("DEFAULT_VALID_STRING_ESCAPE", text, scope='constant.character.escape')
-default_invalid_string_escape = Attribute("DEFAULT_INVALID_STRING_ESCAPE", text, scope='invalid')
-default_predefined_symbol = Attribute("DEFAULT_PREDEFINED_SYMBOL", default_identifier, scope='support.type')
-default_metadata = Attribute("DEFAULT_METADATA", text, scope='meta.tag')
-default_markup_tag = Attribute("DEFAULT_TAG", text, scope='punctuation.definition.tag')
-default_markup_attribute = Attribute("DEFAULT_ATTRIBUTE", default_identifier, scope='entity.other.attribute-name')
-default_markup_entity = Attribute("DEFAULT_ENTITY", default_identifier, scope='constant.character.entity')
-default_template_language = Attribute("DEFAULT_TEMPLATE_LANGUAGE_COLOR", text, scope='text source')
+default_identifier=Attribute("DEFAULT_IDENTIFIER", text, scope='entity')
+default_number=Attribute("DEFAULT_NUMBER", text, scope='constant.numeric')
+default_keyword=Attribute("DEFAULT_KEYWORD", text, scope='keyword')
+default_string=Attribute("DEFAULT_STRING", text, scope='string')
+default_block_comment=Attribute("DEFAULT_BLOCK_COMMENT", text, scope='comment.block')
+default_line_comment=Attribute("DEFAULT_LINE_COMMENT", text, scope='comment.line')
+default_doc_comment=Attribute("DEFAULT_DOC_COMMENT", text, scope='comment.documentation')
+default_operation_sign=Attribute("DEFAULT_OPERATION_SIGN", text, scope='keyword.operator')
+default_braces=Attribute("DEFAULT_BRACES", text, scope='punctuation')
+default_dot=Attribute("DEFAULT_DOT", text, scope='punctuation')
+default_semicolon=Attribute("DEFAULT_SEMICOLON", text, scope='punctuation')
+default_comma=Attribute("DEFAULT_COMMA", text, scope='punctuation')
+default_parentheses=Attribute("DEFAULT_PARENTHS", text, scope='punctuation')
+default_brackets=Attribute("DEFAULT_BRACKETS", text, scope='punctuation')
+default_label=Attribute("DEFAULT_LABEL", default_identifier)
+default_constant=Attribute("DEFAULT_CONSTANT", default_identifier, scope='constant')
+default_local_variable=Attribute("DEFAULT_LOCAL_VARIABLE", default_identifier, scope='variable')
+default_global_variable=Attribute("DEFAULT_GLOBAL_VARIABLE", default_local_variable, font_style=2)
+default_function_declaration=Attribute("DEFAULT_FUNCTION_DECLARATION", default_identifier, scope='entity.name.function')
+default_function_call=Attribute("DEFAULT_FUNCTION_CALL", default_identifier, scope='support.function')
+default_parameter=Attribute("DEFAULT_PARAMETER", default_identifier, scope='variable.parameter')
+default_class_name=Attribute("DEFAULT_CLASS_NAME", default_identifier, scope='entity.name')
+default_interface_name=Attribute("DEFAULT_INTERFACE_NAME", default_class_name)
+default_instance_method=Attribute("DEFAULT_INSTANCE_METHOD", default_function_declaration)
+default_instance_field=Attribute("DEFAULT_INSTANCE_FIELD", default_local_variable)
+default_static_method=Attribute("DEFAULT_STATIC_METHOD", default_function_declaration)
+default_static_field=Attribute("DEFAULT_STATIC_FIELD", default_global_variable)
+default_doc_comment_markup=Attribute("DEFAULT_DOC_MARKUP", default_doc_comment)
+default_doc_comment_tag=Attribute("DEFAULT_DOC_COMMENT_TAG", default_doc_comment)
+default_valid_string_escape=Attribute("DEFAULT_VALID_STRING_ESCAPE", text, scope='constant.character.escape')
+default_invalid_string_escape=Attribute("DEFAULT_INVALID_STRING_ESCAPE", text, scope='invalid')
+default_predefined_symbol=Attribute("DEFAULT_PREDEFINED_SYMBOL", default_identifier, scope='support.type')
+default_metadata=Attribute("DEFAULT_METADATA", text, scope='meta.tag')
+default_markup_tag=Attribute("DEFAULT_TAG", text, scope='punctuation.definition.tag')
+default_markup_attribute=Attribute("DEFAULT_ATTRIBUTE", default_identifier, scope='entity.other.attribute-name')
+default_markup_entity=Attribute("DEFAULT_ENTITY", default_identifier, scope='constant.character.entity')
+default_template_language=Attribute("DEFAULT_TEMPLATE_LANGUAGE_COLOR", text, scope='text source')
 
 # CodeInsightColors (Java)
 java_local_variable = Attribute("LOCAL_VARIABLE_ATTRIBUTES", text)
@@ -360,7 +346,7 @@ dj_filter = Attribute("DJANGO_FILTER", default_braces, scope='support.function')
 gql_string_literal = Attribute("GQL_STRING_LITERAL", default_string)
 gql_keyword = Attribute("GQL_KEYWORD", default_keyword)
 gql_int_literal = Attribute("GQL_INT_LITERAL", default_number)
-gql_id = Attribute("GQL_ID", default_number)
+gql_id =Attribute("GQL_ID", default_number)
 
 # BuildoutCfgSyntaxHighlighter
 bld_section_name = Attribute("BUILDOUT.SECTION_NAME", default_number)
@@ -441,8 +427,7 @@ puppet_keyword = Attribute("PUPPET_KEYWORD", default_keyword, scope="keyword.con
 puppet_digit = Attribute("PUPPET_NUMBER", default_number)
 puppet_dq_string = Attribute("PUPPET_STRING", default_string, scope="string.quoted.double.puppet")
 puppet_sq_string = Attribute("PUPPET_SQ_STRING", default_string, scope="string.quoted.single.puppet")
-puppet_operation_sign = Attribute("PUPPET_OPERATION_SIGN", default_operation_sign,
-                                  scope="keyword.operator.assignment.puppet")
+puppet_operation_sign = Attribute("PUPPET_OPERATION_SIGN", default_operation_sign, scope="keyword.operator.assignment.puppet")
 puppet_parenths = Attribute("PUPPET_PARENTH", default_parentheses, scope="punctuation.section.scope.puppet")
 puppet_brackets = Attribute("PUPPET_BRACKETS", default_brackets, scope="punctuation.definition.array.begin.puppet")
 puppet_braces = Attribute("PUPPET_BRACES", default_braces, scope="punctuation.section.scope.puppet")
@@ -460,7 +445,7 @@ rb_heredoc = Attribute("RUBY_HEREDOC_CONTENT", default_string, scope='string.unq
 rb_number = Attribute("RUBY_NUMBER", default_number)
 rb_string = Attribute("RUBY_STRING", default_string, scope="string.quoted.single.ruby")
 rb_interpolated_string = Attribute("RUBY_INTERPOLATED_STRING", default_string, scope="string.quoted.double.ruby")
-rb_words = Attribute("RUBY_WORDS", default_string, scope="string.quoted.other.literal.upper.ruby")
+rb_words = Attribute("RUBY_WORDS", default_string, scope= "string.quoted.other.literal.upper.ruby")
 rb_escape_sequence = Attribute("RUBY_ESCAPE_SEQUENCE", default_valid_string_escape)
 rb_invalid_escape_sequence = Attribute("RUBY_INVALID_ESCAPE_SEQUENCE", default_invalid_string_escape)
 rb_opSign = Attribute("RUBY_OPERATION_SIGN", default_operation_sign)
@@ -534,40 +519,32 @@ cucumber_pystring = Attribute("GHERKIN_PYSTRING", default_string, scope='string.
 cucumber_table_header = Attribute("GHERKIN_TABLE_HEADER_CELL", cucumber_text, scope='variable.other')
 cucumber_table_cell = Attribute("GHERKIN_TABLE_CELL", cucumber_text)
 cucumber_table_pipe = Attribute("GHERKIN_TABLE_PIPE", default_semicolon, scope='keyword.control.cucumber.table')
-cucumber_outline_param_substitution = Attribute("GHERKIN_OUTLINE_PARAMETER_SUBSTITUTION", cucumber_text,
-                                                scope='variable.other')
+cucumber_outline_param_substitution = Attribute("GHERKIN_OUTLINE_PARAMETER_SUBSTITUTION", cucumber_text, scope='variable.other')
 cucumber_scenario_regexp_param = Attribute("GHERKIN_REGEXP_PARAMETER", cucumber_text, scope='string.quoted.double')
 
-# CoffeeScript
+#CoffeeScript
 coffee_block_comment = Attribute("COFFEESCRIPT.BLOCK_COMMENT", default_block_comment, scope='comment.block.coffee')
 coffee_line_comment = Attribute("COFFEESCRIPT.LINE_COMMENT", default_block_comment, scope='comment.line.coffee')
 coffee_bad_char = Attribute("COFFEESCRIPT.BAD_CHARACTER", bad_character)
-coffee_semicolon = Attribute("COFFEESCRIPT.SEMICOLON", default_semicolon,
-                             scope='punctuation.terminator.statement.coffee')
+coffee_semicolon = Attribute("COFFEESCRIPT.SEMICOLON", default_semicolon, scope='punctuation.terminator.statement.coffee')
 coffee_comma = Attribute("COFFEESCRIPT.COMMA", default_comma, scope='meta.delimiter.object.comma.coffee')
 coffee_dot = Attribute("COFFEESCRIPT.DOT", default_dot, scope='meta.delimiter.method.period.coffee')
 coffee_class = Attribute("COFFEESCRIPT.CLASS_NAME", text, scope='entity.name.function.coffee')
 coffee_identifier = Attribute("COFFEESCRIPT.IDENTIFIER", text, scope='source.coffee', background=IGNORE_COLOR)
 coffee_local_var = Attribute("COFFEESCRIPT.LOCAL_VARIABLE", coffee_identifier)
-coffee_global_var = Attribute("COFFEESCRIPT.GLOBAL_VARIABLE", coffee_identifier,
-                              scope='variable.other.readwrite.global')
+coffee_global_var = Attribute("COFFEESCRIPT.GLOBAL_VARIABLE", coffee_identifier, scope='variable.other.readwrite.global')
 coffee_function_name = Attribute("COFFEESCRIPT.FUNCTION_NAME", text, scope='entity.name.function.coffee')
 coffee_obj_key = Attribute("COFFEESCRIPT.OBJECT_KEY", text, scope='variable.assignment.coffee')
 coffee_number = Attribute("COFFEESCRIPT.NUMBER", default_number, scope='constant.numeric.coffee')
 coffee_bool = Attribute("COFFEESCRIPT.BOOLEAN", default_keyword, scope='constant.language.boolean')
-coffee_str_bound = Attribute("COFFEESCRIPT.STRING_LITERAL", default_string,
-                             scope='punctuation.definition.string.begin.coffee')
+coffee_str_bound = Attribute("COFFEESCRIPT.STRING_LITERAL", default_string, scope='punctuation.definition.string.begin.coffee')
 coffee_str = Attribute("COFFEESCRIPT.STRING", default_string, scope='string.quoted.single.coffee')
-coffee_heredoc_id = Attribute("COFFEESCRIPT.HEREDOC_ID", default_string,
-                              scope='punctuation.definition.string.begin.coffee')
-coffee_heredoc_content = Attribute("COFFEESCRIPT.HEREDOC_CONTENT", default_string,
-                                   scope='string.quoted.double.heredoc.coffee')
+coffee_heredoc_id = Attribute("COFFEESCRIPT.HEREDOC_ID", default_string, scope='punctuation.definition.string.begin.coffee')
+coffee_heredoc_content = Attribute("COFFEESCRIPT.HEREDOC_CONTENT", default_string, scope='string.quoted.double.heredoc.coffee')
 coffee_heregex_id = Attribute("COFFEESCRIPT.HEREGEX_ID", default_string, scope='string.regexp.coffee')
 coffee_heregex_content = Attribute("COFFEESCRIPT.HEREGEX_CONTENT", default_string, scope='string.regexp.coffee')
-coffee_js_id = Attribute("COFFEESCRIPT.JAVASCRIPT_ID", default_string,
-                         scope='punctuation.definition.string.begin.coffee')
-coffee_expression_substitution = Attribute("COFFEESCRIPT.EXPRESSIONS_SUBSTITUTION_MARK", text,
-                                           scope='punctuation.section.embedded.coffee')
+coffee_js_id = Attribute("COFFEESCRIPT.JAVASCRIPT_ID", default_string, scope='punctuation.definition.string.begin.coffee')
+coffee_expression_substitution = Attribute("COFFEESCRIPT.EXPRESSIONS_SUBSTITUTION_MARK", text, scope='punctuation.section.embedded.coffee')
 coffee_parenths = Attribute("COFFEESCRIPT.PARENTHESIS", default_parentheses, scope='meta.brace.round.coffee')
 coffee_brackets = Attribute("COFFEESCRIPT.BRACKET", default_brackets, scope='meta.brace.square.coffee')
 coffee_braces = Attribute("COFFEESCRIPT.BRACE", default_braces, scope='meta.brace.curly.coffee')
@@ -580,15 +557,13 @@ coffee_this = Attribute("COFFEESCRIPT.THIS", default_keyword, scope='variable.la
 coffee_colon = Attribute("COFFEESCRIPT.COLON", default_semicolon, scope='keyword.operator.coffee')
 coffee_prototype = Attribute("COFFEESCRIPT.PROTOTYPE", text, scope='entity.name.function.coffee')
 coffee_fun_arrow = Attribute("COFFEESCRIPT.FUNCTION", default_number, scope='storage.type.function.coffee')
-coffee_fun_binding_arrow = Attribute("COFFEESCRIPT.FUNCTION_BINDING", default_number,
-                                     scope='storage.type.function.coffee')
+coffee_fun_binding_arrow = Attribute("COFFEESCRIPT.FUNCTION_BINDING", default_number, scope='storage.type.function.coffee')
 coffee_regexp_id = Attribute("COFFEESCRIPT.REGULAR_EXPRESSION_ID", default_string, scope='string.regexp.coffee')
 coffee_regexp = Attribute("COFFEESCRIPT.REGULAR_EXPRESSION_CONTENT", default_string, scope='string.regexp.coffee')
 coffee_regexp_flag = Attribute("COFFEESCRIPT.REGULAR_EXPRESSION_FLAG", default_string, scope='string.regexp.coffee')
-coffee_escaped_chars = Attribute("COFFEESCRIPT.ESCAPE_SEQUENCE", default_valid_string_escape,
-                                 scope='constant.character.escape.coffe')
-coffee_js_injection = Attribute("COFFEESCRIPT.JAVASCRIPT_CONTENT", default_string, scope='string.quoted.script.coffee',
-                                foreground=IGNORE_COLOR)
+coffee_escaped_chars = Attribute("COFFEESCRIPT.ESCAPE_SEQUENCE", default_valid_string_escape, scope='constant.character.escape.coffe')
+coffee_js_injection = Attribute("COFFEESCRIPT.JAVASCRIPT_CONTENT", default_string, scope='string.quoted.script.coffee', foreground=IGNORE_COLOR)
+
 
 # ERB : "text.html.ruby"
 erb_text = xml_tag
@@ -598,8 +573,7 @@ erb_block_expression_start = Attribute("RHTML_EXPRESSION_START_ID", erb_text, sc
 erb_block_expression_end = Attribute("RHTML_EXPRESSION_END_ID", erb_text, scope='punctuation.section.embedded.ruby')
 erb_comment = Attribute("RHTML_COMMENT_ID", default_line_comment, scope='comment.block.erb')
 erb_omit_line_modifier = Attribute("RHTML_OMIT_NEW_LINE_ID", erb_text, scope='punctuation.section.embedded.ruby')
-erb_ruby_injection_bg = Attribute("RHTML_SCRIPTING_BACKGROUND_ID", erb_text, scope='source.ruby.rails.embedded.html',
-                                  foreground=IGNORE_COLOR)
+erb_ruby_injection_bg = Attribute("RHTML_SCRIPTING_BACKGROUND_ID", erb_text, scope='source.ruby.rails.embedded.html', foreground=IGNORE_COLOR)
 
 # ClojureHighlighter
 clj_comment = Attribute("Clojure Line comment", default_line_comment)
@@ -634,7 +608,7 @@ oc_format_token = Attribute("OC_FORMAT_TOKEN", default_string, scope='string sou
 oc_class_reference = Attribute("CLASS_REFERENCE", oc_typedef, scope='entity.name.class')
 oc_protocol_reference = Attribute("PROTOCOL_REFERENCE", oc_class_reference, scope='meta.implementation.objc')
 oc_message_argument = Attribute("OC.MESSAGE_ARGUMENT", default_function_call, scope='entity.name.function')
-oc_method_declaration = Attribute("OC.METHOD_DECLARATION", default_function_declaration, scope='entity.name.function')
+oc_method_declaration = Attribute("OC.METHOD_DECLARATION", default_function_declaration,  scope='entity.name.function')
 oc_parameter = Attribute("OC.PARAMETER", text, scope='variable.parameter.function.objc')
 oc_badcharacter = Attribute("OC.BADCHARACTER", text, scope='invalid')
 oc_dot = Attribute("OC.DOT", text)
@@ -685,16 +659,15 @@ jade_file_path = Attribute("JADE_FILE_PATH", default_string)
 jade_filter_name = Attribute("JADE_FILTER_NAME", default_label)
 jade_js_block = Attribute("JADE_JS_BLOCK", default_identifier)
 
-
 def color_from_textmate(color, alpha_blend_with=None):
     rgba = color[1:]
     if len(rgba) == 8 and alpha_blend_with:
         r, g, b = hex_to_rgb(rgba[:6])
         rb, gb, bb = hex_to_rgb(alpha_blend_with[1:])
         alpha = int(rgba[6:8], 16) / 256
-        r = r * alpha + rb * (1 - alpha)
-        g = g * alpha + gb * (1 - alpha)
-        b = b * alpha + bb * (1 - alpha)
+        r = r * alpha + rb * (1-alpha)
+        g = g * alpha + gb * (1-alpha)
+        b = b * alpha + bb * (1-alpha)
         return rgb_to_hex(r, g, b)
     if len(rgba) == 3:
         r = rgba[0]
@@ -703,13 +676,11 @@ def color_from_textmate(color, alpha_blend_with=None):
         return r + r + g + g + b + b
     return rgba[:6]
 
-
 def font_style_from_textmate(style):
     result = 0
     if 'bold' in style: result += 1
     if 'italic' in style: result += 2
     return result
-
 
 def attr_from_textmate(settings, old_value, background):
     result = AttributeValue()
@@ -726,7 +697,6 @@ def attr_from_textmate(settings, old_value, background):
         if 'underline' in tm_font_style:
             result.effect_type = 1
     return result
-
 
 def find_by_scope(settings, scope):
     # compound scope
@@ -769,7 +739,7 @@ def find_by_scope(settings, scope):
 
                 if matchingScope == scope:
                     if isSimpleScope:
-                        return setting
+                      return setting
                     less_specific = setting
                     less_specific_weight = len(matchingScope)
                     less_specific_selector_size = aScopeSelectorSize
@@ -799,14 +769,13 @@ def find_by_scope(settings, scope):
 
     return ss_less_specific if (ss_less_specific is not None) else less_specific
 
-
 def load_textmate_scheme(tmtheme):
     themeDict = plistlib.readPlist(tmtheme)
     all_settings = themeDict['settings']
     used_scopes = set()
     default_settings = find_by_scope(all_settings, None)
     if not default_settings:
-        print("Cannot find default settings")
+        print "Cannot find default settings"
         return
     default_settings = default_settings['settings']
 
@@ -860,30 +829,25 @@ def load_textmate_scheme(tmtheme):
             if settings:
                 the_scope = settings['scope']
                 if the_scope:
-                    print("converting attribute " + attr.id + " from TextMate scope " + the_scope)
+                    print "converting attribute " + attr.id + " from TextMate scope " + the_scope
                     used_scopes.add(the_scope)
                 attr.value = attr_from_textmate(settings['settings'], attr.value, background)
             else:
-                print("[!] scope not found: " + attr.scope)
+               print "[!] scope not found: " + attr.scope
     return all_settings, used_scopes
 
-
 def blend_spy_js_attributes(background):
-    Attribute("SPY-JS.FUNCTION_SCOPE", text, background=blend_with_as_rgb256(background, "#FFFFF0", "04"),
-              effect_type=2)
+    Attribute("SPY-JS.FUNCTION_SCOPE", text, background=blend_with_as_rgb256(background, "#FFFFF0", "04"), effect_type=2)
     Attribute("SPY-JS.PROGRAM_SCOPE", text, background=blend_with_as_rgb256(background, "#FFFFFF", "04"), effect_type=2)
     Attribute("SPY-JS.EXCEPTION", text, background=blend_with_as_rgb256(background, "#FFCCCC", "04"), effect_type=2)
-    Attribute("SPY-JS.PATH_LEVEL_ONE", text, background=blend_with_as_rgb256(background, "#E2FFE2", "04"),
-              effect_type=2)
+    Attribute("SPY-JS.PATH_LEVEL_ONE", text, background=blend_with_as_rgb256(background, "#E2FFE2", "04"), effect_type=2)
     Attribute("SPY-JS.PATH_LEVEL_TWO", text, effect_type=1)
     Attribute("SPY-JS.VALUE_HINT", text, effect_type=0)
     return
 
-
 def blend_with_as_rgb256(base_hex_color, blend_with_hex_color, blend_hex_alpha):
     result = hex_to_rgb(color_from_textmate(base_hex_color + blend_hex_alpha, blend_with_hex_color))
     return int(result[0] * 256), int(result[1] * 256), int(result[2] * 256)
-
 
 def underscore_to_camelcase(value):
     def camelcase():
@@ -893,19 +857,17 @@ def underscore_to_camelcase(value):
     c = camelcase()
     return "".join(c.next()(x) if x else '_' for x in value.split("_"))
 
-
 def isDark():
     back = hex_to_rgb(text.value.background)
-    intensity = (back[0] + back[1] + back[2]) / 3
+    intensity = (back[0] + back[1] + back[2])/3
     return intensity < 0.5
-
 
 def write_idea_scheme(filename):
     name, ext = os.path.splitext(os.path.basename(filename))
     baseName = "Darcula" if isDark() else "Default"
     scheme = ET.Element("scheme", name=underscore_to_camelcase(name), version="1", parent_scheme=baseName)
     colors = ET.SubElement(scheme, 'colors')
-    for name, value in all_colors.items():
+    for name, value in all_colors.iteritems():
         ET.SubElement(colors, 'option', name=name, value=value)
     attributes = ET.SubElement(scheme, 'attributes')
 
@@ -914,9 +876,9 @@ def write_idea_scheme(filename):
 
     for attr in all_attributes:
         if attr.value.inherited:
-            print('inheriting ' + attr.id + ' from ' + attr.parent.id)
+            print 'inheriting ' + attr.id + ' from ' + attr.parent.id
         elif isinstance(attr.value, DerivedAttributeValue):
-            print('transforming IDEA default color for ' + attr.id)
+            print 'transforming IDEA default color for ' + attr.id
         fore = attr.value.foreground
         back = attr.value.background
         saveFg = fore and (fore != IGNORE_COLOR_VALUE)
@@ -944,15 +906,16 @@ def write_idea_scheme(filename):
     capitalize_colors(scheme)
     ET.ElementTree(scheme).write(open(filename, "w+"))
 
-
 if len(sys.argv) != 3:
-    print('Usage: colorSchemeTool <TextMate scheme> <IDEA/PyCharm/RubyMine scheme>')
+    print 'Usage: colorSchemeTool <TextMate scheme> <IDEA/PyCharm/RubyMine scheme>'
     exit(1)
 
 all_settings, used_scopes = load_textmate_scheme(sys.argv[1])
 write_idea_scheme(sys.argv[2])
 
+
+
 for setting in all_settings:
     scope = setting.get('scope', None)
     if scope and not scope in used_scopes:
-        print("Unused scope: " + scope)
+        print "Unused scope: " + scope

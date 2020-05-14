@@ -1,4 +1,8 @@
+[Paul Bui Project](https://github.com/paulbui/)
+
 [![JetBrains team project](http://jb.gg/badges/team.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+
+Forked project from JetBrains colorSchemeTool
 
 This is a tool to convert color schemes from TextMate to IntelliJ Platform
 based products such as IntelliJ IDEA, RubyMine and PyCharm.
@@ -12,7 +16,3 @@ text is readable.
 
 The table of the mappings is not yet complete; additions and corrections
 are very much welcome.
-
-Note that the tool requires Python version 2.7. The default version of
-Python installed on MacOS X Snow Leopard is 2.6; you'll need to use Python 
-from MacPorts/Homebrew if you'd like to run the tool on 10.6.
